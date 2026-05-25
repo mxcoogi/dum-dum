@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -68,6 +69,29 @@ public class StoreService {
     public StoreDetailResponse getStore(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new ApiException(ResponseCode.STORE_NOT_FOUND));
+        return StoreDetailResponse.from(store);
+    }
+
+    /**
+     * 가게 정보 수정
+     * @param userId
+     * @param storeId
+     * @param name
+     * @param description
+     * @param phoneNumber
+     * @param profileImageUrl
+     * @return
+     */
+    public StoreDetailResponse updateStore(Long userId, Long storeId, String name, String description, String phoneNumber, String profileImageUrl){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(ResponseCode.USER_NOT_FOUND));
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new ApiException(ResponseCode.STORE_NOT_FOUND));
+        if(!Objects.equals(user.getId(), store.getUser().getId())){
+            throw new ApiException(ResponseCode.FORBIDDEN);
+        }
+        store.updateInfo(name, description, phoneNumber, profileImageUrl);
+        storeRepository.save(store);
         return StoreDetailResponse.from(store);
     }
 }
