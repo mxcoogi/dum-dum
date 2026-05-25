@@ -60,6 +60,7 @@ public class AuthService {
         RefreshToken saved = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new ApiException(ResponseCode.INVALID_TOKEN));
 
+        // 만료된 토큰은 즉시 삭제 후 예외 — 탈취 토큰이 재사용되지 않도록
         if (saved.isExpired()) {
             refreshTokenRepository.delete(saved);
             throw new ApiException(ResponseCode.EXPIRED_TOKEN);
@@ -71,6 +72,7 @@ public class AuthService {
         LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(
                 jwtTokenProvider.getRefreshTokenExpiry(clientType) / 1000);
 
+        // rotate: 기존 토큰 무효화 + 새 토큰 저장 (token reuse detection)
         saved.rotate(newRefreshToken, expiresAt);
 
         return TokenResponse.builder()
@@ -91,6 +93,7 @@ public class AuthService {
         LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(
                 jwtTokenProvider.getRefreshTokenExpiry(clientType) / 1000);
 
+        // WEB/MOBILE 각각 1개씩 유지 — 재로그인 시 기존 토큰 rotate, 없으면 신규 생성
         refreshTokenRepository.findByUserAndClientType(user, clientType)
                 .ifPresentOrElse(
                         existing -> existing.rotate(refreshToken, expiresAt),
