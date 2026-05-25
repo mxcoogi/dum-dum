@@ -96,9 +96,19 @@ public class ProductService {
         }
 
         int order = product.getImages().size();
-        for (MultipartFile file : files) {
-            String url = storageService.upload(file, "products");
-            product.addImage(url, order++);
+        List<String> uploadedUrls = new java.util.ArrayList<>();
+        try {
+            for (MultipartFile file : files) {
+                String url = storageService.upload(file, "products");
+                uploadedUrls.add(url);
+                product.addImage(url, order++);
+            }
+        } catch (Exception e) {
+            // 업로드 성공한 파일 보상 삭제 — DB는 트랜잭션 롤백으로 처리
+            uploadedUrls.forEach(url -> {
+                try { storageService.delete(url); } catch (Exception ignored) {}
+            });
+            throw e;
         }
     }
 
