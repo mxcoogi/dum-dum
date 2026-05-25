@@ -94,4 +94,17 @@ public class StoreService {
         storeRepository.save(store);
         return StoreDetailResponse.from(store);
     }
+
+    /**
+     * 가게 인증
+     * ADMIN 전용
+     * @param storeId
+     * @return
+     */
+    public StoreDetailResponse verifyStore(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new ApiException(ResponseCode.STORE_NOT_FOUND));
+        store.verify();
+        return StoreDetailResponse.from(store);
+    }
 }
