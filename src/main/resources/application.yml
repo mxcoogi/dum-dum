@@ -80,3 +80,8 @@ jwt:
   access-token-expiry: 1800000             # 30분 (ms)
   web-refresh-token-expiry: 604800000      # 7일 (ms)
   mobile-refresh-token-expiry: 2592000000  # 30일 (ms)
+
+storage:
+  local:
+    base-path: ./uploads
+    base-url: http://localhost:8080/uploads
