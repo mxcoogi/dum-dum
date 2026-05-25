@@ -80,17 +80,18 @@ public class ProductService {
 
     /**
      * 이미지 업로드 — 기존 이미지 뒤에 순서 이어서 추가
-     * displayOrder는 기존 이미지 수부터 시작 (덮어쓰지 않음)
+     * 동시 요청 시 displayOrder 충돌 방지를 위해 비관적 락 사용
+     * 기존 + 신규 합산 5장 초과 불가
      */
     public void uploadImages(Long userId, Long productId, List<MultipartFile> files) {
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findByIdWithLock(productId)
                 .orElseThrow(() -> new ApiException(ResponseCode.PRODUCT_NOT_FOUND));
 
         if (!product.getStore().getUser().getId().equals(userId)) {
             throw new ApiException(ResponseCode.STORE_ACCESS_DENIED);
         }
 
-        if (files.size() > 5) {
+        if (product.getImages().size() + files.size() > 5) {
             throw new ApiException(ResponseCode.INVALID_INPUT);
         }
 
