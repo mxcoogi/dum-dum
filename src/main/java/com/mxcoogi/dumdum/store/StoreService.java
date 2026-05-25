@@ -45,6 +45,11 @@ public class StoreService {
         return StoreDetailResponse.from(store);
     }
 
+    /**
+     * 내 가게 목록 조회
+     * @param userId
+     * @return
+     */
     public List<StoreListResponse> getMyStores(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(ResponseCode.USER_NOT_FOUND));
@@ -53,5 +58,16 @@ public class StoreService {
                 .map(StoreListResponse::from)
                 .toList();
         return list;
+    }
+
+    /**
+     * 가게 상세 조회
+     * @param storeId
+     * @return
+     */
+    public StoreDetailResponse getStore(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new ApiException(ResponseCode.STORE_NOT_FOUND));
+        return StoreDetailResponse.from(store);
     }
 }
