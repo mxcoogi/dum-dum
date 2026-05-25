@@ -77,4 +77,18 @@ public class ReservationService {
         }
         return ReservationDetailResponse.from(reservation);
     }
+
+    public void cancelReservation(Long userId, Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ApiException(ResponseCode.RESERVATION_NOT_FOUND));
+        if (!reservation.getUser().getId().equals(userId)) {
+            throw new ApiException(ResponseCode.RESERVATION_ACCESS_DENIED);
+        }
+        if (!reservation.isCancellable()) {
+            throw new ApiException(ResponseCode.CANNOT_CANCEL);
+        }
+        reservation.cancel();
+        // 취소된 수량만큼 재고 복구
+        reservation.getProduct().cancelReservation(reservation.getQuantity());
+    }
 }
