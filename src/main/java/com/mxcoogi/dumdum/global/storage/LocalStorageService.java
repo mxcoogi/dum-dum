@@ -41,8 +41,18 @@ public class LocalStorageService implements StorageService {
 
     @Override
     public void delete(String fileUrl) {
-        String relativePath = fileUrl.replace(baseUrl, "");
-        Path filePath = Paths.get(basePath, relativePath);
+        String prefix = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+        String relativePath = fileUrl.startsWith(prefix)
+                ? fileUrl.substring(prefix.length())
+                : fileUrl;
+
+        Path rootPath = Paths.get(basePath).toAbsolutePath().normalize();
+        Path filePath = rootPath.resolve(relativePath).normalize();
+
+        // basePath 벗어나는 경로 차단 (path traversal 방지)
+        if (!filePath.startsWith(rootPath)) {
+            throw new ApiException(ResponseCode.INTERNAL_SERVER_ERROR);
+        }
 
         try {
             Files.deleteIfExists(filePath);
