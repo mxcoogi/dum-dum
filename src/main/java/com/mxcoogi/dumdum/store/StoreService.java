@@ -7,8 +7,11 @@ import com.mxcoogi.dumdum.domain.user.UserRepository;
 import com.mxcoogi.dumdum.global.common.ResponseCode;
 import com.mxcoogi.dumdum.global.exception.ApiException;
 import com.mxcoogi.dumdum.store.dto.StoreDetailResponse;
+import com.mxcoogi.dumdum.store.dto.StoreListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,5 +43,15 @@ public class StoreService {
                 address, latitude, longitude, businessRegistrationNumber);
         storeRepository.save(store);
         return StoreDetailResponse.from(store);
+    }
+
+    public List<StoreListResponse> getMyStores(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(ResponseCode.USER_NOT_FOUND));
+        List<StoreListResponse> list = storeRepository.findByUser(user)
+                .stream()
+                .map(StoreListResponse::from)
+                .toList();
+        return list;
     }
 }

@@ -7,6 +7,7 @@ public record StoreListResponse(
         Long storeId,
         String name,
         String address,
+        String imageUrl,
         VerificationStatus verificationStatus
 ) {
     public static StoreListResponse from(Store store) {
@@ -14,6 +15,7 @@ public record StoreListResponse(
                 store.getId(),
                 store.getName(),
                 store.getAddress(),
+                store.getProfileImageUrl(),
                 store.getVerificationStatus()
         );
     }
