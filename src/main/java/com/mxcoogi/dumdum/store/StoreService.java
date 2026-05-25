@@ -10,12 +10,14 @@ import com.mxcoogi.dumdum.store.dto.StoreDetailResponse;
 import com.mxcoogi.dumdum.store.dto.StoreListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StoreService {
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
@@ -51,6 +53,7 @@ public class StoreService {
      * @param userId
      * @return
      */
+    @Transactional(readOnly = true)
     public List<StoreListResponse> getMyStores(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(ResponseCode.USER_NOT_FOUND));
@@ -66,6 +69,7 @@ public class StoreService {
      * @param storeId
      * @return
      */
+    @Transactional(readOnly = true)
     public StoreDetailResponse getStore(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new ApiException(ResponseCode.STORE_NOT_FOUND));
