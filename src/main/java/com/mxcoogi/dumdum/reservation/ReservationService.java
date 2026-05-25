@@ -11,6 +11,7 @@ import com.mxcoogi.dumdum.domain.user.UserRepository;
 import com.mxcoogi.dumdum.global.common.ResponseCode;
 import com.mxcoogi.dumdum.global.exception.ApiException;
 import com.mxcoogi.dumdum.reservation.dto.ReservationCreateResponse;
+import com.mxcoogi.dumdum.reservation.dto.ReservationDetailResponse;
 import com.mxcoogi.dumdum.reservation.dto.ReservationListResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -65,5 +66,15 @@ public class ReservationService {
                 .stream()
                 .map(ReservationListResponse::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationDetailResponse getReservation(Long userId, Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ApiException(ResponseCode.RESERVATION_NOT_FOUND));
+        if (!reservation.getUser().getId().equals(userId)) {
+            throw new ApiException(ResponseCode.RESERVATION_ACCESS_DENIED);
+        }
+        return ReservationDetailResponse.from(reservation);
     }
 }
