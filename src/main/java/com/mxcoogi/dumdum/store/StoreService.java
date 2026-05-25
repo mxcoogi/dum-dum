@@ -6,6 +6,7 @@ import com.mxcoogi.dumdum.domain.user.User;
 import com.mxcoogi.dumdum.domain.user.UserRepository;
 import com.mxcoogi.dumdum.global.common.ResponseCode;
 import com.mxcoogi.dumdum.global.exception.ApiException;
+import com.mxcoogi.dumdum.store.dto.StoreCreateResponse;
 import com.mxcoogi.dumdum.store.dto.StoreDetailResponse;
 import com.mxcoogi.dumdum.store.dto.StoreListResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class StoreService {
      * @param businessRegistrationNumber
      * @return
      */
-    public StoreDetailResponse registerStore(Long userId, String name, String description,
+    public StoreCreateResponse registerStore(Long userId, String name, String description,
                                              Double latitude, Double longitude,
                                              String address, String phoneNumber, String businessRegistrationNumber) {
         User user = userRepository.findById(userId)
@@ -45,7 +46,7 @@ public class StoreService {
         Store store = Store.create(user, name, description, phoneNumber,
                 address, latitude, longitude, businessRegistrationNumber);
         storeRepository.save(store);
-        return StoreDetailResponse.from(store);
+        return StoreCreateResponse.from(store);
     }
 
     /**
@@ -57,11 +58,10 @@ public class StoreService {
     public List<StoreListResponse> getMyStores(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(ResponseCode.USER_NOT_FOUND));
-        List<StoreListResponse> list = storeRepository.findByUser(user)
+        return storeRepository.findByUser(user)
                 .stream()
                 .map(StoreListResponse::from)
                 .toList();
-        return list;
     }
 
     /**
@@ -92,10 +92,9 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new ApiException(ResponseCode.STORE_NOT_FOUND));
         if(!Objects.equals(user.getId(), store.getUser().getId())){
-            throw new ApiException(ResponseCode.FORBIDDEN);
+            throw new ApiException(ResponseCode.STORE_ACCESS_DENIED);
         }
         store.updateInfo(name, description, phoneNumber, profileImageUrl);
-        storeRepository.save(store);
         return StoreDetailResponse.from(store);
     }
 

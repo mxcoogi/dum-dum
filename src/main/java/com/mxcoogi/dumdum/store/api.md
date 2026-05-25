@@ -90,6 +90,7 @@ Authorization: Bearer {accessToken}
       "storeId": 1,
       "name": "홍길동 베이커리",
       "address": "서울시 마포구 어딘가 123",
+      "imageUrl": "https://...",
       "verificationStatus": "VERIFIED"
     }
   ]
@@ -150,7 +151,18 @@ Authorization: Bearer {accessToken}
 ```json
 {
   "code": "SUCCESS",
-  "message": "성공"
+  "message": "성공",
+  "data": {
+    "storeId": 1,
+    "name": "홍길동 베이커리 2호점",
+    "description": "리뉴얼 오픈",
+    "phoneNumber": "010-9999-8888",
+    "address": "서울시 마포구 어딘가 123",
+    "latitude": 37.5665,
+    "longitude": 126.9780,
+    "profileImageUrl": "https://...",
+    "verificationStatus": "VERIFIED"
+  }
 }
 ```
 
@@ -172,7 +184,18 @@ Authorization: Bearer {accessToken}
 ```json
 {
   "code": "SUCCESS",
-  "message": "성공"
+  "message": "성공",
+  "data": {
+    "storeId": 1,
+    "name": "홍길동 베이커리",
+    "description": "매일 신선한 빵",
+    "phoneNumber": "010-1234-5678",
+    "address": "서울시 마포구 어딘가 123",
+    "latitude": 37.5665,
+    "longitude": 126.9780,
+    "profileImageUrl": "https://...",
+    "verificationStatus": "VERIFIED"
+  }
 }
 ```
 
@@ -194,7 +217,18 @@ Authorization: Bearer {accessToken}
 ```json
 {
   "code": "SUCCESS",
-  "message": "성공"
+  "message": "성공",
+  "data": {
+    "storeId": 1,
+    "name": "홍길동 베이커리",
+    "description": "매일 신선한 빵",
+    "phoneNumber": "010-1234-5678",
+    "address": "서울시 마포구 어딘가 123",
+    "latitude": 37.5665,
+    "longitude": 126.9780,
+    "profileImageUrl": "https://...",
+    "verificationStatus": "REJECTED"
+  }
 }
 ```
 
