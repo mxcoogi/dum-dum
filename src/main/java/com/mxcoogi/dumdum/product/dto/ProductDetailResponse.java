@@ -15,9 +15,12 @@ public record ProductDetailResponse(
         int originalPrice,
         int discountedPrice,
         int totalQuantity,
+        /** 현재 예약 가능한 잔여 수량 */
         int remainingQuantity,
         LocalDateTime pickupDeadline,
+        /** AVAILABLE | SOLD_OUT | EXPIRED | CANCELLED */
         ProductStatus status,
+        /** displayOrder 오름차순 정렬 */
         List<ImageInfo> images
 ) {
     public record ImageInfo(String imageUrl, int displayOrder) {}
