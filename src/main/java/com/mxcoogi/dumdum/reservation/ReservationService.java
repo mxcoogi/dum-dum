@@ -11,7 +11,10 @@ import com.mxcoogi.dumdum.domain.user.UserRepository;
 import com.mxcoogi.dumdum.global.common.ResponseCode;
 import com.mxcoogi.dumdum.global.exception.ApiException;
 import com.mxcoogi.dumdum.reservation.dto.ReservationCreateResponse;
+import com.mxcoogi.dumdum.reservation.dto.ReservationListResponse;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,5 +55,15 @@ public class ReservationService {
         Reservation reservation = Reservation.create(user, product, quantity);
         reservationRepository.save(reservation);
         return ReservationCreateResponse.from(reservation);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationListResponse> getMyReservations(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(ResponseCode.USER_NOT_FOUND));
+        return reservationRepository.findByUser(user)
+                .stream()
+                .map(ReservationListResponse::from)
+                .toList();
     }
 }
