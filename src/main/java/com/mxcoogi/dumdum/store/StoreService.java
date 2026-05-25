@@ -107,4 +107,16 @@ public class StoreService {
         store.verify();
         return StoreDetailResponse.from(store);
     }
+    /**
+     * 가게 인증 거부
+     * ADMIN 전용
+     * @param storeId
+     * @return
+     */
+    public StoreDetailResponse rejectVerifyStore(Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new ApiException(ResponseCode.STORE_NOT_FOUND));
+        store.reject();
+        return StoreDetailResponse.from(store);
+    }
 }
