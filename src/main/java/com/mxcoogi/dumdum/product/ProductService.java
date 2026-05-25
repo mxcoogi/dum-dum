@@ -90,6 +90,10 @@ public class ProductService {
             throw new ApiException(ResponseCode.STORE_ACCESS_DENIED);
         }
 
+        if (files.size() > 5) {
+            throw new ApiException(ResponseCode.INVALID_INPUT);
+        }
+
         int order = product.getImages().size();
         for (MultipartFile file : files) {
             String url = storageService.upload(file, "products");
