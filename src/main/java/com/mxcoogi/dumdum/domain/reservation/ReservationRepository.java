@@ -15,7 +15,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByProduct(Product product);
 
-    boolean existsByUserAndProductAndStatusNot(User user, Product product, ReservationStatus status);
+    boolean existsByUserAndProductAndStatus(User user, Product product, ReservationStatus status);
 
     @Query("""
             SELECT r FROM Reservation r
