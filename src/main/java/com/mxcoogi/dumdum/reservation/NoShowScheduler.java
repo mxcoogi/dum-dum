@@ -1,5 +1,7 @@
 package com.mxcoogi.dumdum.reservation;
 
+import com.mxcoogi.dumdum.domain.product.Product;
+import com.mxcoogi.dumdum.domain.product.ProductRepository;
 import com.mxcoogi.dumdum.domain.reservation.Reservation;
 import com.mxcoogi.dumdum.domain.reservation.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.List;
 public class NoShowScheduler {
 
     private final ReservationRepository reservationRepository;
+    private final ProductRepository productRepository;
 
     /** 5분마다 실행 — pickupDeadline 지난 PENDING 예약을 NO_SHOW 처리 */
     @Scheduled(fixedDelay = 300000)
@@ -31,8 +34,9 @@ public class NoShowScheduler {
         for (Reservation reservation : expired) {
             reservation.markNoShow();
             reservation.getUser().incrementNoShow();
-            // 노쇼 수량만큼 재고 복구
-            reservation.getProduct().cancelReservation(reservation.getQuantity());
+            Product product = productRepository.findByIdWithLock(reservation.getProduct().getId())
+                    .orElseThrow();
+            product.cancelReservation(reservation.getQuantity());
         }
 
         log.info("[NoShowScheduler] 노쇼 처리 완료: {}건", expired.size());

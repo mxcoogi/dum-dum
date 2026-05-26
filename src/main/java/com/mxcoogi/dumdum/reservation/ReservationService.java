@@ -79,7 +79,7 @@ public class ReservationService {
     }
 
     public void cancelReservation(Long userId, Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
+        Reservation reservation = reservationRepository.findByIdWithLock(reservationId)
                 .orElseThrow(() -> new ApiException(ResponseCode.RESERVATION_NOT_FOUND));
         if (!reservation.getUser().getId().equals(userId)) {
             throw new ApiException(ResponseCode.RESERVATION_ACCESS_DENIED);
@@ -88,13 +88,14 @@ public class ReservationService {
             throw new ApiException(ResponseCode.CANNOT_CANCEL);
         }
         reservation.cancel();
-        // 취소된 수량만큼 재고 복구
-        reservation.getProduct().cancelReservation(reservation.getQuantity());
+        Product product = productRepository.findByIdWithLock(reservation.getProduct().getId())
+                .orElseThrow(() -> new ApiException(ResponseCode.PRODUCT_NOT_FOUND));
+        product.cancelReservation(reservation.getQuantity());
     }
 
     /** 가게 사장님이 방문 완료 처리 — 예약한 상품의 가게 소유자만 가능 */
     public void completeReservation(Long userId, Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
+        Reservation reservation = reservationRepository.findByIdWithLock(reservationId)
                 .orElseThrow(() -> new ApiException(ResponseCode.RESERVATION_NOT_FOUND));
         if (!reservation.getProduct().getStore().getUser().getId().equals(userId)) {
             throw new ApiException(ResponseCode.STORE_ACCESS_DENIED);
