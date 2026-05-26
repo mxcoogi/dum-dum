@@ -16,6 +16,44 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot1234"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: dumdum-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: dumdum
+      DB_USERNAME: dumdum
+      DB_PASSWORD: dumdum1234
+      # prod profile은 useSSL=true — 컨테이너 내부 MySQL엔 SSL 없으므로 오버라이드
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dumdum?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+      # prod profile은 ddl-auto=validate — 최초 기동 시 update로 오버라이드
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: ${JWT_SECRET}
+      OAUTH2_REDIRECT_URI: ${OAUTH2_REDIRECT_URI:-http://localhost:8080}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID:-dummy}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-dummy}
+      NAVER_CLIENT_ID: ${NAVER_CLIENT_ID:-dummy}
+      NAVER_CLIENT_SECRET: ${NAVER_CLIENT_SECRET:-dummy}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-dummy}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-dummy}
+      APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-dummy}
+      APPLE_CLIENT_SECRET: ${APPLE_CLIENT_SECRET:-dummy}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
 
 volumes:
   mysql-data:

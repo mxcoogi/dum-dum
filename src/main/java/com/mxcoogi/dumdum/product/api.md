@@ -189,3 +189,4 @@ Authorization: Bearer {accessToken}
 |------|------|
 | PRODUCT_NOT_FOUND | 존재하지 않는 상품 |
 | STORE_ACCESS_DENIED | 본인 가게 아님 |
+| PRODUCT_UNAVAILABLE | EXPIRED·CANCELLED 상태 취소 불가 |

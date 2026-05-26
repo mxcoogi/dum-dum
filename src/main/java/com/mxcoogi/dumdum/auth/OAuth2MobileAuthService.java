@@ -85,7 +85,10 @@ public class OAuth2MobileAuthService {
         return response.getBody();
     }
 
-    /** Apple은 userinfo 엔드포인트 없음 — ID token(JWT) payload 디코딩으로 유저 정보 추출 */
+    /**
+     * Apple은 userinfo 엔드포인트 없음 — ID token(JWT) payload 디코딩으로 유저 정보 추출
+     * 주의: RS256 서명 검증 미구현. Apple 설정 완료 후 apple-auth-keys로 검증 추가 필요.
+     */
     private Map<String, Object> decodeAppleIdToken(String idToken) {
         try {
             String[] parts = idToken.split("\\.");
@@ -113,6 +116,7 @@ public class OAuth2MobileAuthService {
     }
 
     private User updateUser(User user, OAuth2UserInfo userInfo) {
+        // 재로그인 시 provider에서 변경된 닉네임/프로필 이미지 반영
         if (userInfo.getNickname() != null) user.updateNickname(userInfo.getNickname());
         if (userInfo.getProfileImageUrl() != null) user.updateProfileImageUrl(userInfo.getProfileImageUrl());
         return user;

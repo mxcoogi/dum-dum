@@ -8,6 +8,7 @@ import com.mxcoogi.dumdum.global.security.oauth2.OAuth2FailureHandler;
 import com.mxcoogi.dumdum.global.security.oauth2.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -41,10 +42,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/oauth2/**",
-                                "/api/products/**",
-                                "/api/stores/*/products"
+                                "/oauth2/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/stores/*").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
