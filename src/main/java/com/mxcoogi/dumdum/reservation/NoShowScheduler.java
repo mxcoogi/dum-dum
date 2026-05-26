@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 
 @Slf4j
 @Component
@@ -32,11 +34,15 @@ public class NoShowScheduler {
         log.info("[NoShowScheduler] 노쇼 처리 대상: {}건", expired.size());
 
         for (Reservation reservation : expired) {
+            Long productId = reservation.getProduct().getId();
+            Optional<Product> productOpt = productRepository.findByIdWithLock(productId);
+            if (productOpt.isEmpty()) {
+                log.error("[NoShowScheduler] 상품 없음, 건너뜀: reservationId={}, productId={}", reservation.getId(), productId);
+                continue;
+            }
             reservation.markNoShow();
             reservation.getUser().incrementNoShow();
-            Product product = productRepository.findByIdWithLock(reservation.getProduct().getId())
-                    .orElseThrow();
-            product.cancelReservation(reservation.getQuantity());
+            productOpt.get().cancelReservation(reservation.getQuantity());
         }
 
         log.info("[NoShowScheduler] 노쇼 처리 완료: {}건", expired.size());
