@@ -3,14 +3,10 @@ name: Deploy to EC2
 on:
   push:
     branches: [ main ]
-  pull_request:
-    types: [ closed ]
-    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
 
     steps:
       - name: SSH into EC2 and deploy
