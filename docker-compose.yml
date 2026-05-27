@@ -49,11 +49,13 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-dummy}
       APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-dummy}
       APPLE_CLIENT_SECRET: ${APPLE_CLIENT_SECRET:-dummy}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION:-ap-northeast-2}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
     depends_on:
       mysql:
         condition: service_healthy
-    volumes:
-      - ./uploads:/app/uploads
 
 volumes:
   mysql-data:

@@ -77,3 +77,13 @@ jwt:
   access-token-expiry: ${JWT_ACCESS_TOKEN_EXPIRY:1800000}
   web-refresh-token-expiry: ${JWT_WEB_REFRESH_TOKEN_EXPIRY:604800000}
   mobile-refresh-token-expiry: ${JWT_MOBILE_REFRESH_TOKEN_EXPIRY:2592000000}
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+    region:
+      static: ${AWS_REGION:ap-northeast-2}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
