@@ -23,7 +23,7 @@ services:
       retries: 10
 
   app:
-    build: .
+    image: 249351068137.dkr.ecr.ap-northeast-2.amazonaws.com/dum-dum:latest
     container_name: dumdum-app
     restart: unless-stopped
     ports:

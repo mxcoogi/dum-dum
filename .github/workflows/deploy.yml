@@ -4,20 +4,45 @@ on:
   push:
     branches: [ main ]
 
+env:
+  ECR_REGISTRY: 249351068137.dkr.ecr.ap-northeast-2.amazonaws.com
+  ECR_REPOSITORY: dum-dum
+  AWS_REGION: ap-northeast-2
+
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: SSH into EC2 and deploy
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 249351068137.dkr.ecr.ap-northeast-2.amazonaws.com
             cd ~/dum-dum
             git pull origin main
-            docker-compose down
-            docker-compose up -d --build
+            docker compose pull app
+            docker compose up -d
             docker image prune -f || true
