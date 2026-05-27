@@ -43,6 +43,6 @@ jobs:
             aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 249351068137.dkr.ecr.ap-northeast-2.amazonaws.com
             cd ~/dum-dum
             git pull origin main
-            docker compose pull app
-            docker compose up -d
+            docker-compose pull app
+            docker-compose up -d
             docker image prune -f || true
